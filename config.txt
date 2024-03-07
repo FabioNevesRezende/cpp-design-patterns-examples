@@ -1,0 +1,4 @@
+theme = dark
+screensize = 1920
+monitor_frequency = 144HZ
+graphics_enhanced = true
