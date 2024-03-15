@@ -2,7 +2,7 @@
 //
 
 #include <iostream>
-#include <format>
+#include <memory>
 
 using namespace std;
 
@@ -54,7 +54,7 @@ public:
 class CoffeeMakerFactory
 {
 public:
-	Coffee* GetCoffee()
+	unique_ptr<Coffee> GetCoffee()
 	{
 		int choice;
 
@@ -67,9 +67,9 @@ public:
 		switch (choice)
 		{
 		case 1:
-			return new Espresso;
+			return unique_ptr<Coffee>(new Espresso);
 		case 2:
-			return new Cappuccino;
+			return unique_ptr<Coffee>(new Cappuccino);
 		default:
 			cout << "Invalid Selection" << endl;
 			return NULL;
@@ -82,6 +82,4 @@ int main()
     CoffeeMakerFactory coffeMachine;
 
     auto c1 = coffeMachine.GetCoffee();
-    delete c1;
-
 }
