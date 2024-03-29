@@ -1,24 +1,26 @@
 #include <iostream>
 #include <vector>
 #include <regex>
+#include <memory>
 
-using std::string, std::cout, std::vector;
+using std::string, std::cout, std::vector, std::move, std::unique_ptr;
 
 class StringValidator {
 public:
-    virtual StringValidator *setNext(StringValidator *nextValidator) = 0;
+    virtual unique_ptr<StringValidator>& setNext(unique_ptr<StringValidator>& nextValidator) = 0;
     virtual ~StringValidator() {};
     virtual string validate(string) = 0;
 };
+typedef unique_ptr<StringValidator> sptr;
 
 class BaseValidator : public StringValidator {
 protected:
-    StringValidator *next = nullptr;
+    sptr next;
 public:
-    ~BaseValidator() { delete next; };
-    StringValidator *setNext(StringValidator *nextValidator) override {
-        next = nextValidator;
-        return nextValidator;
+    ~BaseValidator() { };
+    sptr& setNext(sptr& nextValidator) override {
+        next = move(nextValidator);
+        return next;
     }
     virtual string validate(string testString) override {
         if (this->next) {
@@ -95,30 +97,31 @@ public:
 int main(int argc, const char* argv[]) {
     vector<string> oldPasswords = { "abc123", "123456", "hello" };
     
-    BaseValidator *emailValidator = new BaseValidator;
-    BaseValidator *passwordValidator = new BaseValidator;
+    auto emailValidator = unique_ptr<BaseValidator>(new BaseValidator);
+    auto passwordValidator = unique_ptr<BaseValidator>(new BaseValidator);
+    auto notEmptyVal = unique_ptr<StringValidator>(new NotEmptyValidator);
+    auto regexVal = unique_ptr<StringValidator>(new RegexValidator("email address", "^\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"));
     
     emailValidator
-        ->setNext(new NotEmptyValidator)
-        ->setNext(new RegexValidator("email address", "^\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"));
+        ->setNext(notEmptyVal)
+        ->setNext(regexVal);
     
         cout << "Checking Emails ---------------\n";
         cout << "Input: \n" << emailValidator->validate("") << "\n\n";
         cout << "Input: shaun\n" << emailValidator->validate("shaun") << "\n\n";
         cout << "Input: shaun@test.com\n" << emailValidator->validate("shaun@test.com") << "\n\n";
 
+    auto lenVal = unique_ptr<StringValidator>(new LengthValidator(6));
+    notEmptyVal = unique_ptr<StringValidator>(new NotEmptyValidator);
+
     passwordValidator
-        ->setNext(new NotEmptyValidator)
-        ->setNext(new LengthValidator(6));
-    
+        ->setNext(notEmptyVal)
+        ->setNext(lenVal);
 
     cout << "Checking passwords ---------------\n";
     cout << "Input: \n" << passwordValidator->validate("") << "\n\n";
     cout << "Input: abc123\n" << passwordValidator->validate(oldPasswords[0]) << "\n\n";
     cout << "Input: hello\n" << passwordValidator->validate(oldPasswords[2]) << "\n\n";
-
-    delete emailValidator;
-    delete passwordValidator;
     
     return 0;
 }
