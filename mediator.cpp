@@ -74,11 +74,12 @@ class UserInterface : public Mediator {
     shared_ptr<TextBox> spousesNameTextBox;
     shared_ptr<ButtonElement> submitButton;
 public:
-    UserInterface() {
-        nameTextBox = shared_ptr<TextBox>(new TextBox("Name textbox", true, shared_ptr<Mediator>(this)));
-        isMarriedCheckbox = shared_ptr<CheckBox>(new CheckBox("Is married checkbox", true, shared_ptr<Mediator>(this)));
-        spousesNameTextBox = shared_ptr<TextBox>(new TextBox("Spouse's name textbox", false, shared_ptr<Mediator>(this)));
-        submitButton = shared_ptr<ButtonElement>(new ButtonElement("Submit button", false, shared_ptr<Mediator>(this)));
+    UserInterface() {}
+    void start(mptr m_ptr) {
+        nameTextBox = shared_ptr<TextBox>(new TextBox("Name textbox", true, m_ptr));
+        isMarriedCheckbox = shared_ptr<CheckBox>(new CheckBox("Is married checkbox", true, m_ptr));
+        spousesNameTextBox = shared_ptr<TextBox>(new TextBox("Spouse's name textbox", false, m_ptr));
+        submitButton = shared_ptr<ButtonElement>(new ButtonElement("Submit button", false, m_ptr));
     }
     ~UserInterface() {
         cout << "Destroying UserInterface\n";
@@ -105,11 +106,11 @@ public:
     shared_ptr<TextBox> getSpousesNameTextBox() { return spousesNameTextBox; };
     shared_ptr<ButtonElement> getSubmitButton() { return submitButton; };
 };
-typedef unique_ptr<UserInterface> uiptr;
 
 int main(int argc, const char * argv[]) {
-    uiptr ui = uiptr(new UserInterface);
-    
+    shared_ptr<UserInterface> ui = shared_ptr<UserInterface>(new UserInterface);
+    ui->start(ui);
+
     shared_ptr<InterfaceElement> elements[] = {
         ui->getNameTextBox(),
         ui->getIsMarriedCheckbox(),
@@ -118,7 +119,7 @@ int main(int argc, const char * argv[]) {
     };
     
     for (auto element : elements) {
-        cout << element->getDescription() << "\n\n";
+        cout << element->getDescription() << "\n";
     }
     
     ui->getIsMarriedCheckbox()->setIsChecked(true);
