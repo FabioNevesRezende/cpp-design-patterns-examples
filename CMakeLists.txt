@@ -66,3 +66,7 @@ endif()
 if(MEDIATOR)
     add_executable(mediator mediator.cpp)
 endif()
+
+if(OBSERVER)
+    add_executable(observer observer.cpp)
+endif()

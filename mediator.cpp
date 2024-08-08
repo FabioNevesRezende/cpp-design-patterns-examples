@@ -1,7 +1,7 @@
 #include <iostream>
 #include <memory>
 
-using std::string, std::shared_ptr, std::cout, std::unique_ptr;
+using std::string, std::shared_ptr, std::cout;
 
 class Mediator {
 public:
