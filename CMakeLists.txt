@@ -70,3 +70,7 @@ endif()
 if(OBSERVER)
     add_executable(observer observer.cpp)
 endif()
+
+if(INTERPRETER)
+    add_executable(interpreter interpreter.cpp)
+endif()
