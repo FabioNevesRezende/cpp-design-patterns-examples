@@ -74,3 +74,7 @@ endif()
 if(INTERPRETER OR ALL)
     add_executable(interpreter interpreter.cpp)
 endif()
+
+if(STATE OR ALL)
+    add_executable(state state.cpp)
+endif()
