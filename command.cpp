@@ -2,18 +2,19 @@
 #include <vector>
 #include <memory>
 
-using std::string, std::vector, std::cout, std::unique_ptr, std::move;
+using std::string, std::vector, std::cout, std::unique_ptr, std::shared_ptr, std::move;
 
 class Command {
 public:
     virtual ~Command() {};
     virtual void execute() = 0;
 };
+typedef unique_ptr<Command> command_ptr;
 
 class Canvas {
     vector<string> shapes;
 public:
-    void addShape(const string & newShape) {
+    void addShape(const string& newShape) {
         shapes.push_back(newShape);
     };
     void clearAll() {
@@ -21,35 +22,37 @@ public:
     };
     vector<string> getShapes() { return shapes; };
 };
+typedef shared_ptr<Canvas> canvas_ptr;
 
 class AddShapeCommand: public Command {
     string shapeName;
-    unique_ptr<Canvas> canvas;
+    canvas_ptr canvas;
 public:
-    AddShapeCommand(const string & shapeName, Canvas* canvas) : shapeName(shapeName), canvas(unique_ptr<Canvas>(canvas)) {};
+    AddShapeCommand(const string& shapeName, canvas_ptr& canvas) : shapeName(shapeName), canvas(canvas) {};
     void execute() {
         canvas->addShape(shapeName);
     }
 };
 
 class ClearCommand: public Command {
-    unique_ptr<Canvas> canvas;
+    canvas_ptr canvas;
 public:
-    ClearCommand(Canvas* canvas) : canvas(unique_ptr<Canvas>(canvas)) {};
+    ClearCommand(canvas_ptr& canvas) : canvas(canvas) {};
     void execute() {
         canvas->clearAll();
     }
 };
 
 class Button {
-    unique_ptr<Command> command;
+    command_ptr command;
 public:
-    Button(Command *command) : command(unique_ptr<Command>(command)) {}
+    Button(command_ptr command) : command(move(command)) {}
     ~Button() { };
     virtual void click() {
         command->execute();
     };
 };
+typedef unique_ptr<Button> button_ptr;
 
 string vectorToString(vector<string> v) {
     string result = "";
@@ -60,11 +63,11 @@ string vectorToString(vector<string> v) {
 }
 
 int main(int argc, const char * argv[]) {
-    Canvas *canvas = new Canvas;
+    canvas_ptr canvas = canvas_ptr(new Canvas);
     
-    Button *addTriangleButton = new Button(new AddShapeCommand("triangle", canvas));
-    Button *addSquareButton = new Button(new AddShapeCommand("square", canvas));
-    Button *clearButton = new Button(new ClearCommand(canvas));
+    button_ptr addTriangleButton = button_ptr(new Button(command_ptr(new AddShapeCommand("triangle", canvas))));
+    button_ptr addSquareButton = button_ptr(new Button(command_ptr(new AddShapeCommand("square", canvas))));
+    button_ptr clearButton = button_ptr(new Button(command_ptr(new ClearCommand(canvas))));
     
     addTriangleButton->click();
     cout << "Current canvas state: " << vectorToString(canvas->getShapes()) << "\n";
@@ -75,7 +78,5 @@ int main(int argc, const char * argv[]) {
     clearButton->click();
     cout << "Current canvas state: " << vectorToString(canvas->getShapes()) << "\n";
     
-    delete canvas;
-
     return 0;
 }
