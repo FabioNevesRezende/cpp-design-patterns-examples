@@ -1,6 +1,7 @@
 #include <iostream>
+#include <memory>
 
-using namespace std;
+using std::string, std::cout, std::endl, std::cin, std::unique_ptr, std::move;
 
 //Door Objects
 class Door
@@ -11,6 +12,7 @@ public:
 	}
 	virtual void Open() = 0;
 };
+typedef unique_ptr<Door> door_ptr;
 
 class GasCarDoor : public Door
 {
@@ -50,6 +52,7 @@ public:
 	}
 	virtual void Run() = 0;
 };
+typedef unique_ptr<Engine> engine_ptr;
 
 class GasEngine : public Engine
 {
@@ -83,39 +86,40 @@ public:
 class CarFactory
 {
 public:
-	virtual Door* BuildDoor() = 0;
-	virtual Engine* BuildEngine() = 0;
+	virtual door_ptr BuildDoor() = 0;
+	virtual engine_ptr BuildEngine() = 0;
 };
+typedef unique_ptr<CarFactory> factory_ptr;
 
 class GasCarFactory :public CarFactory
 {
 public:
-	Door * BuildDoor()
+	door_ptr BuildDoor()
 	{
-		return new GasCarDoor();
+		return move(door_ptr(new GasCarDoor()));
 	}
-	Engine* BuildEngine()
+	engine_ptr BuildEngine()
 	{
-		return new GasEngine();
+		return move(engine_ptr(new GasEngine()));
 	}
 };
 
 class ElectricCarFactory :public CarFactory
 {
 public:
-	Door * BuildDoor()
+	door_ptr BuildDoor()
 	{
-		return new ElectricCarDoor();
+		return move(door_ptr(new ElectricCarDoor()));
 	}
-	Engine* BuildEngine()
+	engine_ptr BuildEngine()
 	{
-		return new ElectricEngine();
+		return move(engine_ptr(new ElectricEngine()));
 	}
 };
 
 int main()
 {
-	CarFactory* CarPlant;
+	factory_ptr CarPlant;
 	int choice;
 
 	cout << "Select a car type: " << endl;
@@ -128,10 +132,10 @@ int main()
 	switch (choice)
 	{
 	case 1:
-		CarPlant = new GasCarFactory;
+		CarPlant = factory_ptr(new GasCarFactory);
 		break;
 	case 2:
-		CarPlant = new ElectricCarFactory;
+		CarPlant = factory_ptr(new ElectricCarFactory);
 		break;
 	default:
 		cout << "Invalid Selection" << endl;
@@ -141,16 +145,13 @@ int main()
 
 	if (CarPlant != NULL)
 	{
-		Door* myDoor = CarPlant->BuildDoor();
-		Engine* myEngine = CarPlant->BuildEngine();
+		door_ptr myDoor = CarPlant->BuildDoor();
+		engine_ptr myEngine = CarPlant->BuildEngine();
 
 		myDoor->Open();
 		myEngine->Run();
 
-        delete myDoor, myEngine;
 	}
-
-    delete CarPlant;
 
     return 0;
 }
