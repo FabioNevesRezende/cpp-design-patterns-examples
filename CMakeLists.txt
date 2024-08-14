@@ -59,10 +59,6 @@ if(COMMANDPTN OR ALL)
     add_executable(command behavioral/command.cpp)
 endif()
 
-if(TESTPTR OR ALL)
-    add_executable(testptr testptr.cpp)
-endif()
-
 if(MEDIATOR OR ALL)
     add_executable(mediator behavioral/mediator.cpp)
 endif()
