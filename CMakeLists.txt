@@ -82,3 +82,7 @@ endif()
 if(TEMPLATE OR ALL)
     add_executable(template behavioral/template.cpp)
 endif()
+
+if(VISITOR OR ALL)
+    add_executable(visitor behavioral/visitor.cpp)
+endif()
