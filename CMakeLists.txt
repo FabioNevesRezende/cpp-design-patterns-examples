@@ -78,3 +78,7 @@ endif()
 if(STRATEGY OR ALL)
     add_executable(strategy behavioral/strategy.cpp)
 endif()
+
+if(TEMPLATE OR ALL)
+    add_executable(template behavioral/template.cpp)
+endif()
