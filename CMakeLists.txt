@@ -78,3 +78,7 @@ endif()
 if(STATE OR ALL)
     add_executable(state state.cpp)
 endif()
+
+if(STRATEGY OR ALL)
+    add_executable(strategy strategy.cpp)
+endif()
