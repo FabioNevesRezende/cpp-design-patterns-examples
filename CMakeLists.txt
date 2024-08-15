@@ -94,3 +94,7 @@ endif()
 if(MEMENTO OR ALL)
     add_executable(memento behavioral/memento.cpp)
 endif()
+
+if(NULLOBJECT OR ALL)
+    add_executable(null-object behavioral/null-object.cpp)
+endif()
