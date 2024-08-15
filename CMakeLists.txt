@@ -86,3 +86,7 @@ endif()
 if(VISITOR OR ALL)
     add_executable(visitor behavioral/visitor.cpp)
 endif()
+
+if(ITERATOR OR ALL)
+    add_executable(iterator behavioral/iterator.cpp)
+endif()
