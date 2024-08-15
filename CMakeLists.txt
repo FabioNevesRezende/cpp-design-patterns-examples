@@ -90,3 +90,7 @@ endif()
 if(ITERATOR OR ALL)
     add_executable(iterator behavioral/iterator.cpp)
 endif()
+
+if(MEMENTO OR ALL)
+    add_executable(memento behavioral/memento.cpp)
+endif()
